@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,7 +17,6 @@ class Home extends ConsumerWidget {
     final keyword = ref.watch(keywordProvider);
     final serchIndexListNotifier = ref.watch(serchIndexListProvider.notifier);
     final serchIndexList = ref.watch(serchIndexListProvider);
-
     List<Book> filteredBooks = [];
 
     return Scaffold(
@@ -35,7 +35,7 @@ class Home extends ConsumerWidget {
         ],
       ),
       body: keyword != ''
-          ? booksList.when(
+          ? booksList?.when(
               data: (books) {
                 filteredBooks = books
                     .where((element) => element['content'].contains(keyword))
@@ -54,7 +54,7 @@ class Home extends ConsumerWidget {
   }
 
   Widget? _allbooks(AsyncValue<List<Book>> booksList) {
-    return booksList.when(
+    return booksList?.when(
       data: (books) {
         // データが正常に取得された場合の処理
         return ListView.builder(

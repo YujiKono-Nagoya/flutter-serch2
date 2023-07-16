@@ -44,19 +44,30 @@ final StateProvider<List<int>> serchIndexListProvider = StateProvider((ref) {
 final booksProvider = StreamProvider<List<Book>>((ref) {
   final selectedValue = ref.watch(selectedValueProvider);
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> stream;
+  CollectionReference<Book> bookRef =
+      FirebaseFirestore.instance.collection('book').withConverter<Book>(
+            fromFirestore: (snapshots, _) {
+              final data = snapshots.data();
+              if (data != null) {
+                return Book.fromJson(data);
+              } else {
+                // エラー処理
+                throw Exception('Firestore data is null.');
+              }
+            },
+            toFirestore: (bookmodel, _) => bookmodel.toJson(),
+          );
+
+  Stream<QuerySnapshot<Book>> stream;
 
   if (selectedValue != '指定なし') {
-    stream = FirebaseFirestore.instance
-        .collection('book')
-        .where('genre', isEqualTo: selectedValue)
-        .snapshots();
+    stream = bookRef.where('genre', isEqualTo: selectedValue).snapshots();
   } else {
-    stream = FirebaseFirestore.instance.collection('book').snapshots();
+    stream = bookRef.snapshots();
   }
 
-  return stream.map((querySnapshot) =>
-      querySnapshot.docs.map((doc) => Book.fromJson(doc.data())).toList());
+  return stream.map(
+      (querySnapshot) => querySnapshot.docs.map((doc) => doc.data()).toList());
 });
 
 final selectedValueProvider = StateProvider<String?>((ref) {

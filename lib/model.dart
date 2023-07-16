@@ -6,12 +6,12 @@ class Book {
     required this.author,
   });
 
-  Book.fromJson(Map<String, dynamic> json)
+  Book.fromJson(Map<String, dynamic> book)
       : this(
-          title: json['title']! as String,
-          content: json['content']! as String,
-          genre: json['genre']! as String,
-          author: json['author']! as String,
+          title: book['title']! as String,
+          content: book['content']! as String,
+          genre: book['genre'] as String? ?? '',
+          author: book['author'] as String? ?? '',
         );
 
   final String title;

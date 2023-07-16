@@ -33,12 +33,12 @@ class _AddPageState extends ConsumerState<AddPage> {
 
   void addBook() async {
     try {
-      await FirebaseFirestore.instance.collection('book').add({
-        'genre': selectedValue,
-        'title': titleEditingController.text,
-        'author': authorEditingController.text,
-        'content': contentEditingController.text,
-      });
+      await bookRef.add(Book(
+        genre: selectedValue.toString(),
+        title: titleEditingController.text,
+        author: authorEditingController.text,
+        content: contentEditingController.text,
+      ));
     } catch (e) {
       print('$e');
     }

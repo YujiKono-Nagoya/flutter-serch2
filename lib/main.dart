@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_serch/firebase_options.dart';
 import 'package:flutter_serch/pages/home.dart';
+import 'package:flutter_serch/pages/home2.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
