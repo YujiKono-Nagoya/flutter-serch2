@@ -66,7 +66,7 @@ class Home extends ConsumerWidget {
                 children: [
                   Text(
                     '${bookData['title']}-${bookData['author']}',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
                   ),
                   Text(
                     '${bookData['content']}',
@@ -96,7 +96,7 @@ class Home extends ConsumerWidget {
             children: [
               Text(
                 '${bookData['title']}-${bookData['author']}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
               ),
               Text(
                 '${bookData['content']}',

@@ -23,17 +23,7 @@ class _SerchPageState extends ConsumerState<SerchPage> {
     final keyword = ref.watch(keywordProvider);
     ref.read(keywordProvider.notifier).state = keyword;
 
-    TextEditingController _controller =
-        TextEditingController(text: ref.read(keywordProvider.notifier).state);
-
     List<Map<String, dynamic>> filteredBooks = [];
-
-    @override
-    void initState() {
-      super.initState();
-      _controller = TextEditingController();
-      _controller.text = ref.read(keywordProvider.notifier).state!;
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +39,7 @@ class _SerchPageState extends ConsumerState<SerchPage> {
               const SizedBox(height: 20),
               Text(
                 '検索条件',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -82,7 +72,9 @@ class _SerchPageState extends ConsumerState<SerchPage> {
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 30),
-                    _searchTextField(),
+                    SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        child: _searchTextField()),
                   ],
                 ),
               ),
@@ -103,10 +95,7 @@ class _SerchPageState extends ConsumerState<SerchPage> {
     List<Book> filteredBooks = [];
 
     _controller.selection = TextSelection.fromPosition(
-      //入力文字のカーソルの位置を管理
-      TextPosition(
-          offset: _controller
-              .text.length), //入力されている文字数を取得し、その位置にカーソルを移動することで末尾にカーソルを当てる
+      TextPosition(offset: _controller.text.length),
     );
 
     @override
