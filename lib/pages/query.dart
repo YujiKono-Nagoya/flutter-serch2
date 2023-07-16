@@ -89,14 +89,15 @@ class _SerchPageState extends ConsumerState<SerchPage> {
     final searchIndexListNotifier = ref.watch(serchIndexListProvider.notifier);
     final List<int> searchIndexList = ref.watch(serchIndexListProvider);
     final booksList = ref.watch(booksProvider);
-    TextEditingController _controller =
-        TextEditingController(text: ref.read(keywordProvider.notifier).state);
 
     List<Book> filteredBooks = [];
 
-    _controller.selection = TextSelection.fromPosition(
-      TextPosition(offset: _controller.text.length),
-    );
+    TextEditingController _controller =
+        TextEditingController.fromValue(TextEditingValue(
+      text: ref.read(keywordProvider.notifier).state ?? '',
+      selection: TextSelection.collapsed(
+          offset: ref.read(keywordProvider.notifier).state?.length ?? 0),
+    ));
 
     @override
     void initState() {

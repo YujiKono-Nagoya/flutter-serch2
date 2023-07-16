@@ -61,18 +61,22 @@ class Home extends ConsumerWidget {
           itemCount: books.length,
           itemBuilder: (context, int index) {
             Book bookData = books[index];
-            return Card(
-              child: Column(
-                children: [
-                  Text(
-                    '${bookData['title']}-${bookData['author']}',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                  ),
-                  Text(
-                    '${bookData['content']}',
-                    style: TextStyle(fontSize: 20),
-                  )
-                ],
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Card(
+                child: Column(
+                  children: [
+                    Text(
+                      '${bookData['title']}-${bookData['author']}',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
+                    ),
+                    Text(
+                      '${bookData['content']}',
+                      style: TextStyle(fontSize: 15),
+                    )
+                  ],
+                ),
               ),
             );
           },
@@ -96,11 +100,11 @@ class Home extends ConsumerWidget {
             children: [
               Text(
                 '${bookData['title']}-${bookData['author']}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
               ),
               Text(
                 '${bookData['content']}',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 15),
               ),
             ],
           ),
