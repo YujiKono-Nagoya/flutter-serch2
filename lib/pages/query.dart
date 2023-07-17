@@ -16,6 +16,35 @@ class _SerchPageState extends ConsumerState<SerchPage> {
   String keyword = '';
   String selectedValue = '指定なし';
   final genre = <String>['指定なし', '人文・思想', '歴史・地理', '科学・工学', '文学・評論', 'アート・建築'];
+  final TextEditingController _controller = TextEditingController();
+
+  TextFormField _searchTextField(TextEditingController controller) {
+    final searchIndexListNotifier = ref.watch(serchIndexListProvider.notifier);
+    final List<int> searchIndexList = ref.watch(serchIndexListProvider);
+    final booksList = ref.watch(booksProvider);
+
+    List<Book> filteredBooks = [];
+
+    return TextFormField(
+      controller: _controller,
+      onChanged: (String text) async {
+        ref.read(keywordProvider.notifier).state = text;
+        booksList.when(
+          data: (books) {
+            filteredBooks = books
+                .where((element) => element['content'].contains(text))
+                .toList();
+          },
+          loading: () => CircularProgressIndicator(),
+          error: (error, stackTrace) => Text('Error: $error'),
+        );
+      },
+      decoration: InputDecoration(
+        hintText: 'キーワード',
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +103,7 @@ class _SerchPageState extends ConsumerState<SerchPage> {
                     const SizedBox(height: 30),
                     SizedBox(
                         width: MediaQuery.of(context).size.width * 0.6,
-                        child: _searchTextField()),
+                        child: _searchTextField(_controller)),
                   ],
                 ),
               ),
@@ -84,52 +113,53 @@ class _SerchPageState extends ConsumerState<SerchPage> {
       ),
     );
   }
-
-  TextFormField _searchTextField() {
-    final searchIndexListNotifier = ref.watch(serchIndexListProvider.notifier);
-    final List<int> searchIndexList = ref.watch(serchIndexListProvider);
-    final booksList = ref.watch(booksProvider);
-
-    List<Book> filteredBooks = [];
-
-    TextEditingController _controller =
-        TextEditingController.fromValue(TextEditingValue(
-      text: ref.read(keywordProvider.notifier).state ?? '',
-      selection: TextSelection.collapsed(
-          offset: ref.read(keywordProvider.notifier).state?.length ?? 0),
-    ));
-
-    @override
-    void initState() {
-      super.initState();
-      _controller = TextEditingController();
-      _controller.text = ref.read(keywordProvider.notifier).state!;
-    }
-
-    @override
-    void dispose() {
-      _controller.dispose();
-      super.dispose();
-    }
-
-    return TextFormField(
-      controller: _controller,
-      onChanged: (String text) async {
-        ref.read(keywordProvider.notifier).state = text;
-        booksList.when(
-          data: (books) {
-            filteredBooks = books
-                .where((element) => element['content'].contains(text))
-                .toList();
-          },
-          loading: () => CircularProgressIndicator(),
-          error: (error, stackTrace) => Text('Error: $error'),
-        );
-      },
-      decoration: InputDecoration(
-        hintText: 'キーワード',
-        border: OutlineInputBorder(),
-      ),
-    );
-  }
 }
+//   TextFormField _searchTextField() {
+//     final searchIndexListNotifier = ref.watch(serchIndexListProvider.notifier);
+//     final List<int> searchIndexList = ref.watch(serchIndexListProvider);
+//     final booksList = ref.watch(booksProvider);
+
+//     List<Book> filteredBooks = [];
+
+//     TextEditingController _controller =
+//         TextEditingController.fromValue(TextEditingValue(
+//       text: ref.read(keywordProvider.notifier).state ?? '',
+//       selection: TextSelection.collapsed(
+//           offset: ref.read(keywordProvider.notifier).state?.length ?? 0),
+//     ));
+
+//     @override
+//     void initState() {
+//       super.initState();
+//       _controller = TextEditingController();
+//       _controller.text = ref.read(keywordProvider.notifier).state!;
+//     }
+
+//     @override
+//     void dispose() {
+//       _controller.dispose();
+//       super.dispose();
+//     }
+
+//     return TextFormField(
+      
+//       controller: _controller,
+//       onChanged: (String text) async {
+//         ref.read(keywordProvider.notifier).state = text;
+//         booksList.when(
+//           data: (books) {
+//             filteredBooks = books
+//                 .where((element) => element['content'].contains(text))
+//                 .toList();
+//           },
+//           loading: () => CircularProgressIndicator(),
+//           error: (error, stackTrace) => Text('Error: $error'),
+//         );
+//       },
+//       decoration: InputDecoration(
+//         hintText: 'キーワード',
+//         border: OutlineInputBorder(),
+//       ),
+//     );
+//   }
+// }
