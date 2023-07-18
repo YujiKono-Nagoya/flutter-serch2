@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_serch/model.dart';
@@ -15,8 +12,6 @@ class Home extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final booksList = ref.watch(booksProvider);
     final keyword = ref.watch(keywordProvider);
-    final serchIndexListNotifier = ref.watch(serchIndexListProvider.notifier);
-    final serchIndexList = ref.watch(serchIndexListProvider);
     List<Book> filteredBooks = [];
 
     return Scaffold(
@@ -35,7 +30,7 @@ class Home extends ConsumerWidget {
         ],
       ),
       body: keyword != ''
-          ? booksList?.when(
+          ? booksList.when(
               data: (books) {
                 filteredBooks = books
                     .where((element) => element['content'].contains(keyword))
@@ -46,15 +41,15 @@ class Home extends ConsumerWidget {
               error: (error, stackTrace) => Text('Error: $error'),
             )
           : _allbooks(booksList),
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => AddPage()));
-      }),
+      // floatingActionButton: FloatingActionButton(onPressed: () {
+      //   Navigator.push(
+      //       context, MaterialPageRoute(builder: (context) => AddPage()));
+      // }),
     );
   }
 
   Widget? _allbooks(AsyncValue<List<Book>> booksList) {
-    return booksList?.when(
+    return booksList.when(
       data: (books) {
         // データが正常に取得された場合の処理
         return ListView.builder(
@@ -65,15 +60,27 @@ class Home extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Card(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${bookData['title']}-${bookData['author']}',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 8.0, left: 8.0, right: 8.0),
+                      child: Text(
+                        '${bookData['title']} - ${bookData['author']}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
                     ),
-                    Text(
-                      '${bookData['content']}',
-                      style: TextStyle(fontSize: 15),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '${bookData['content']}',
+                        style: TextStyle(fontSize: 14),
+                        textAlign: TextAlign.left,
+                      ),
                     )
                   ],
                 ),
