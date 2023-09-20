@@ -1,82 +1,102 @@
-// import 'dart:convert';
-// import 'dart:math';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_serch/firebase_options.dart';
+import 'package:flutter_serch/firebase_service.dart';
+import 'package:flutter_serch/pages/home.dart';
+import 'package:flutter_serch/pages/serch.dart';
 
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutter_serch/model.dart';
-// import 'package:flutter_serch/pages/add_page.dart';
-// import 'package:flutter_serch/pages/query.dart';
-// import 'package:flutter_serch/pages/riverpod/provider.dart';
+final booksStreamProvider = StreamProvider((ref) {
+  final genre = ref.watch(genreProvider);
+  if (genre != '指定なし') {
+    return FirestoreService().getBooksStream(changeQuery: (query) {
+      return query.where('genre', isEqualTo: genre);
+    });
+  } else {
+    return FirestoreService().getBooksStream();
+  }
+});
 
-// class Home2 extends ConsumerWidget {
-//   const Home2({super.key});
+class Home2 extends ConsumerWidget {
+  const Home2({Key? key}) : super(key: key);
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     CollectionReference<Book> bookRef =
-//         FirebaseFirestore.instance.collection('book').withConverter(
-//               fromFirestore: (snapshots, _) => Book.fromJson(snapshots.data()!),
-//               toFirestore: (bookModel, _) => bookModel.toJson(),
-//             );
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         backgroundColor: Colors.green,
-//         centerTitle: false,
-//         title: Text('蔵書一覧'),
-//         actions: [
-//           IconButton(
-//             onPressed: () {
-//               Navigator.of(context)
-//                   .push(MaterialPageRoute(builder: (context) => SerchPage()));
-//             },
-//             icon: Icon(Icons.search),
-//           ),
-//         ],
-//       ),
-//       body: Column(
-//         children: [
-//           StreamBuilder<QuerySnapshot<Book>>(
-//               stream: bookRef.snapshots(),
-//               builder: (context, snapshot) {
-//                 if (snapshot.hasData) {
-//                   final data = snapshot.data!;
-//                   return Expanded(
-//                     child: ListView.builder(
-//                         itemCount: data.docs.length,
-//                         itemBuilder: (context, index) {
-//                           return UserCard(bookModel: data.docs[index].data());
-//                         }),
-//                   );
-//                 }
-//                 return Center(
-//                   child: CircularProgressIndicator(),
-//                 );
-//               })
-//         ],
-//       ),
-//       floatingActionButton: FloatingActionButton(onPressed: () {
-//         Navigator.push(
-//             context, MaterialPageRoute(builder: (context) => AddPage()));
-//       }),
-//     );
-//   }
-// }
-
-// class UserCard extends StatelessWidget {
-//   const UserCard({Key? key, required this.bookModel}) : super(key: key);
-
-//   final Book bookModel;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       child: Container(
-//         padding: EdgeInsets.all(10),
-//         margin: EdgeInsets.all(10),
-//         child: Text('名前:${bookModel.author}'),
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('蔵書一覧'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SearchScreen()));
+              },
+              icon: const Icon(Icons.search))
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Consumer(
+          builder: (context, ref, child) {
+            final books = ref.watch(booksStreamProvider);
+            final keyword = ref.watch(keywordProvider);
+            return books.when(
+                data: (data) {
+                  final docs = data.docs
+                      .where((element) =>
+                          (element.data().content.contains(keyword)) ||
+                          (element.data().title.contains(keyword)))
+                      .toList();
+                  return ListView.builder(
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      final book = docs[index].data();
+                      return Card(
+                          child: Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                    child: Text(
+                                  '${book.title} - ${book.author}',
+                                  overflow: TextOverflow.clip,
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                                //Icon(Icons.star_border, color: Colors.yellow,),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              book.content,
+                              overflow: TextOverflow.clip,
+                              style: const TextStyle(
+                                color: Color(0xff666666),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ));
+                    },
+                  );
+                },
+                error: (err, stack) => const Center(
+                      child: Text('データを取得できませんでした'),
+                    ),
+                loading: () => const Center(
+                      child: CircularProgressIndicator(),
+                    ));
+          },
+        ),
+      ),
+    );
+  }
+}
