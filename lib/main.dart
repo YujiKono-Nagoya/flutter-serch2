@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.green,
       ),
+      // 変更
       home: Home2(),
     );
   }
